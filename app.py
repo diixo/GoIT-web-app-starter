@@ -17,19 +17,19 @@ class HttpGetHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         pr_url = urllib.parse.urlparse(self.path)
 
-        match pr_url.path:
-            case '/':
-                self.send_html_file('index.html')
-            case '/blog':
-                self.send_html_file('blog.html')
-            case '/contact':
-                self.send_html_file('contact.html')
-            case _:
-                file = BASE_DIR.joinpath(pr_url.path[1:])
-                if file.exists():
-                    self.send_static(file)
-                else:
-                    self.send_html_file('404.html', 404)
+        if pr_url.path == '/':
+            self.send_html_file('index.html')
+        elif pr_url.path == '/blog':
+            self.send_html_file('blog.html')
+        elif pr_url.path == '/contact':
+            self.send_html_file('contact.html')
+        else:
+            print(f"get<<{pr_url.path}")
+            file = BASE_DIR.joinpath(pr_url.path[1:])
+            if file.exists():
+                self.send_static(file)
+            else:
+                self.send_html_file('404.html', 404)
 
     def send_static(self, file):
         self.send_response(200)
@@ -51,7 +51,7 @@ class HttpGetHandler(BaseHTTPRequestHandler):
 
 
 def run(server_class=HTTPServer, handler_class=HttpGetHandler):
-    server_address = ('', 8000)
+    server_address = ('', 2500)
     http = server_class(server_address, handler_class)
     try:
         http.serve_forever()
