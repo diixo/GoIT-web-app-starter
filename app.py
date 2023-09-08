@@ -1,3 +1,4 @@
+import json
 import pathlib
 import urllib.parse
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -7,9 +8,16 @@ BASE_DIR = pathlib.Path()
 
 
 class HttpGetHandler(BaseHTTPRequestHandler):
+
     def do_POST(self):
-        data = self.rfile.read(int(self.headers['Content-Length']))
-        print(data)
+        #read with limit
+        body = self.rfile.read(int(self.headers['Content-Length']))
+        body = urllib.parse.unquote_plus(body.decode())
+        payload = {key: value for key, value in [el.split('=') for el in body.split('&')]}
+        print(payload)
+        with open('data.json', 'w', encoding='utf-8') as fd:
+            json.dump(payload, fd, ensure_ascii=False)
+
         self.send_response(302)
         self.send_header('Location', '/contact')
         self.end_headers()
